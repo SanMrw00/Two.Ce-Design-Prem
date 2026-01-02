@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two.Ce | Creative Design Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        gold: '#D4AF37',
+                        dark: '#050505',
+                        glass: 'rgba(255, 255, 255, 0.03)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #050505; color: #ffffff; overflow-x: hidden; }
+        
+        /* Premium Glass Effect */
+        .glass-nav { background: rgba(5, 5, 5, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .glass-card { background: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%); border: 1px solid rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); }
+        
+        /* Animations */
+        .fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; transform: translateY(30px); }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+        
+        .section-content { display: none; }
+        .section-active { display: block; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6366f1; }
+
+        /* Loader */
+        .loader { width: 24px; height: 24px; border: 2px solid #333; border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- AMBIENT BACKGROUND LIGHT -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] opacity-30 animate-pulse"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] opacity-30"></div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="fixed w-full z-50 glass-nav top-0 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <!-- Brand -->
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="showSection('home')">
+                <div class="w-10 h-10 bg-white text-black rounded-xl flex items-center justify-center font-display font-bold text-xl group-hover:scale-105 transition-transform">2C</div>
+                <div class="flex flex-col">
+                    <span class="font-display font-bold text-lg leading-none tracking-tight">TWO.CE</span>
+                    <span class="text-[9px] text-gray-400 tracking-[0.2em] uppercase">Design</span>
+                </div>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex items-center gap-1 p-1 bg-white/5 rounded-full border border-white/5 backdrop-blur-md">
+                <button onclick="showSection('logo')" class="px-6 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all">Logo</button>
+                <button onclick="showSection('poster')" class="px-6 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all">Poster</button>
+                <button onclick="showSection('testimoni')" class="px-6 py-2 rounded-full text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 transition-all">Testimoni</button>
+            </div>
+
+            <!-- CTA Order -->
+            <button onclick="showSection('kontak')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/25 hover:-translate-y-0.5">
+                Order Now
+            </button>
+        </div>
+        
+        <!-- Mobile Menu (Simple Row) -->
+        <div class="md:hidden flex justify-center gap-4 py-3 border-t border-white/5 bg-black/50 backdrop-blur-xl">
+            <button onclick="showSection('logo')" class="text-xs font-medium text-gray-400 hover:text-white">Logo</button>
+            <button onclick="showSection('poster')" class="text-xs font-medium text-gray-400 hover:text-white">Poster</button>
+            <button onclick="showSection('testimoni')" class="text-xs font-medium text-gray-400 hover:text-white">Testimoni</button>
+        </div>
+    </nav>
+
+    <!-- MUSIC PLAYER (Minimalist) -->
+    <div class="fixed bottom-6 left-6 z-40 flex items-center gap-3 glass-card p-2 pr-4 rounded-full transition-all hover:border-indigo-500/30 group">
+        <button id="musicBtn" onclick="toggleMusic()" class="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+            <i id="musicIcon" class="fa-solid fa-play text-[10px]"></i>
+        </button>
+        <div class="flex flex-col">
+            <span class="text-[8px] uppercase tracking-widest text-gray-500 font-bold">Sound</span>
+            <span id="musicStatus" class="text-[10px] font-bold text-white leading-none">Paused</span>
+        </div>
+        <audio id="bgAudio" loop>
+            <source src="https://payable-pink-pzmgwtdrue.edgeone.app/DJ%20TOR%20MONITOR%20KETUA%20-%20ORANG%20BARU%20LEBE%20GACOR%20SLOW%20VIRAL%20TIKTOK%20FULL%20SONG%20MAMAN%20FVNDY%202025.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <main class="min-h-screen pt-32 pb-20 px-4 md:px-6 max-w-7xl mx-auto">
+        
+        <!-- HOME SECTION -->
+        <section id="home" class="section-content section-active fade-up">
+            <div class="text-center py-20 lg:py-32 relative">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 mb-8">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-300">Premium Digital Service</span>
+                </div>
+                
+                <h1 class="font-display text-5xl md:text-8xl font-bold mb-6 leading-tight tracking-tight">
+                    Elevate Your <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-white to-indigo-400">Digital Presence.</span>
+                </h1>
+                
+                <p class="text-gray-400 max-w-xl mx-auto text-sm md:text-base leading-relaxed mb-10">
+                    Kami menciptakan identitas visual yang kuat melalui desain logo, poster, dan branding yang estetik dan profesional.
+                </p>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="showSection('logo')" class="group relative px-8 py-4 bg-white text-black rounded-full font-bold text-sm overflow-hidden transition-all hover:scale-105">
+                        <span class="relative z-10">Lihat Portofolio</span>
+                        <div class="absolute inset-0 bg-indigo-500 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                        <span class="absolute inset-0 z-10 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">Lihat Portofolio</span>
+                    </button>
+                    <button onclick="showSection('testimoni')" class="px-8 py-4 rounded-full border border-white/10 hover:bg-white/5 font-medium text-sm transition-all">
+                        Cek Testimoni
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- GALLERY SECTION (Logo, Poster, Testimoni) -->
+        <section id="gallery" class="section-content">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6 fade-up">
+                <div>
+                    <h2 id="gallery-subtitle" class="text-indigo-500 text-xs font-bold uppercase tracking-[0.3em] mb-2">Portfolio</h2>
+                    <h1 id="gallery-title" class="font-display text-4xl md:text-5xl font-bold uppercase">Category</h1>
+                </div>
+                
+                <!-- Admin Upload Trigger -->
+                <button id="btn-tambah" onclick="openModal()" class="hidden flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wide transition-all shadow-lg shadow-emerald-900/20">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Data
+                </button>
+            </div>
+            
+            <div id="loading-icon" class="hidden py-32 flex flex-col items-center justify-center fade-up">
+                <div class="loader mb-4"></div>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest">Synchronizing Database...</p>
+            </div>
+
+            <!-- MASONRY GRID -->
+            <div id="grid-produk" class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6 pb-20 fade-up"></div>
+        </section>
+
+        <!-- KONTAK / ORDER SECTION -->
+        <section id="kontak" class="section-content text-center py-20 fade-up">
+            <div class="max-w-2xl mx-auto glass-card p-12 rounded-[3rem] relative overflow-hidden group">
+                <!-- Decorative Elements -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 group-hover:bg-indigo-600/30 transition-colors"></div>
+                
+                <h2 class="font-display text-4xl md:text-5xl font-bold mb-6 relative z-10">Siap Bekerja Sama?</h2>
+                <p class="text-gray-400 mb-10 relative z-10">Konsultasikan kebutuhan desain Anda. Kami siap memberikan solusi visual terbaik dengan harga bersahabat.</p>
+                
+                <a href="https://wa.me/6282313179985" target="_blank" class="relative z-10 inline-flex items-center gap-3 bg-white text-black px-10 py-4 rounded-full font-bold text-sm hover:scale-105 transition-transform shadow-xl">
+                    <i class="fa-brands fa-whatsapp text-xl"></i>
+                    Chat WhatsApp Sekarang
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-12 text-center border-t border-white/5">
+        <div class="flex justify-center items-center gap-2 mb-4 opacity-50">
+            <i class="fa-brands fa-instagram hover:text-white cursor-pointer transition-colors"></i>
+            <i class="fa-brands fa-tiktok hover:text-white cursor-pointer transition-colors"></i>
+        </div>
+        <p class="text-[10px] text-gray-600 font-medium uppercase tracking-[0.2em]">© 2025 Two.Ce Design</p>
+        <button onclick="adminLogin()" class="mt-6 text-[9px] text-gray-800 hover:text-indigo-500 font-bold uppercase tracking-widest transition-colors">Master Access</button>
+    </footer>
+
+    <!-- MODAL UPLOAD (ADMIN) -->
+    <div id="modal-upload" class="fixed inset-0 bg-black/95 z-[100] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="glass-card w-full max-w-md p-8 rounded-3xl relative fade-up">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-display text-xl font-bold">New Entry</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Judul / Klien</label>
+                    <input type="text" id="in-title" class="w-full bg-black/50 border border-white/10 p-3 rounded-xl text-sm text-white focus:border-indigo-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Direct Link Gambar</label>
+                    <input type="text" id="in-url" placeholder="https://i.postimg.cc/..." class="w-full bg-black/50 border border-white/10 p-3 rounded-xl text-sm text-white focus:border-indigo-500 outline-none transition-colors">
+                </div>
+                <div>
+                    <label class="text-[10px] uppercase font-bold text-gray-500 ml-1">Kategori</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <!-- Custom Radio Select -->
+                        <button onclick="selectCat('logo')" id="btn-cat-logo" class="cat-btn border border-white/10 p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-white/5">Logo</button>
+                        <button onclick="selectCat('poster')" id="btn-cat-poster" class="cat-btn border border-white/10 p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-white/5">Poster</button>
+                        <button onclick="selectCat('testimoni')" id="btn-cat-testimoni" class="cat-btn border border-white/10 p-2 rounded-lg text-[10px] font-bold uppercase hover:bg-white/5">Testimoni</button>
+                    </div>
+                    <input type="hidden" id="in-cat">
+                </div>
+                
+                <button onclick="saveData()" id="btn-save" class="w-full bg-indigo-600 hover:bg-indigo-500 py-4 rounded-xl font-bold text-xs uppercase tracking-widest mt-2 transition-all">Publish Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, query, where, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfqWDv9QS7SL6aytsvzuytdD6zt0nGkl0",
+            authDomain: "twoce-galery.firebaseapp.com",
+            projectId: "twoce-galery",
+            storageBucket: "twoce-galery.firebasestorage.app",
+            messagingSenderId: "1090811244564",
+            appId: "1:1090811244564:web:fbf71083f6725b7ff0f701"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let isAdmin = false;
+
+        // --- NAVIGATION LOGIC ---
+        window.showSection = function(id) {
+            // Animasi scroll ke atas
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            
+            // Hide all sections first
+            document.querySelectorAll('.section-content').forEach(s => {
+                s.classList.remove('section-active', 'fade-up');
+            });
+
+            setTimeout(() => {
+                if(id === 'home' || id === 'kontak') {
+                    const el = document.getElementById(id);
+                    el.classList.add('section-active', 'fade-up');
+                } else {
+                    const el = document.getElementById('gallery');
+                    el.classList.add('section-active', 'fade-up');
+                    
+                    // Update Title
+                    document.getElementById('gallery-title').innerText = id + " Gallery";
+                    document.getElementById('gallery-subtitle').innerText = "Katalog " + id;
+                    
+                    loadData(id);
+                }
+            }, 100);
+        };
+
+        // --- LOAD DATA (MASONRY) ---
+        async function loadData(cat) {
+            const grid = document.getElementById('grid-produk');
+            const loader = document.getElementById('loading-icon');
+            
+            grid.innerHTML = '';
+            loader.classList.remove('hidden');
+
+            try {
+                // Query ke Firestore
+                const q = query(collection(db, "produk"), where("category", "==", cat), orderBy("time", "desc"));
+                const snap = await getDocs(q);
+                
+                loader.classList.add('hidden');
+
+                if(snap.empty) {
+                    grid.innerHTML = `
+                        <div class="col-span-full py-20 text-center border border-dashed border-white/10 rounded-3xl">
+                            <i class="fa-regular fa-folder-open text-2xl text-gray-600 mb-3"></i>
+                            <p class="text-gray-500 font-bold uppercase tracking-widest text-[10px]">Data Kosong</p>
+                        </div>`;
+                    return;
+                }
+
+                snap.forEach((d) => {
+                    const item = d.data();
+                    
+                    // Masonry Card Item
+                    grid.innerHTML += `
+                        <div class="break-inside-avoid mb-6 group relative bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-indigo-500/30 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-500/10">
+                            
+                            ${isAdmin ? `<button onclick="deleteData('${d.id}', '${cat}')" class="absolute top-3 right-3 bg-red-500/90 backdrop-blur px-3 py-1.5 rounded-lg text-[9px] font-bold z-20 hover:bg-red-600 transition-colors">DELETE</button>` : ''}
+                            
+                            <div class="w-full relative">
+                                <img src="${item.url}" 
+                                     class="w-full h-auto object-contain block grayscale-[50%] group-hover:grayscale-0 transition-all duration-700" 
+                                     loading="lazy"
+                                     onerror="this.src='https://placehold.co/600x400/111/FFF?text=Image+Error'">
+                                     
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity"></div>
+                                
+                                <div class="absolute bottom-0 left-0 p-5 w-full translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+                                    <p class="text-indigo-400 font-bold text-[9px] uppercase tracking-widest mb-1 opacity-80">${cat}</p>
+                                    <h3 class="text-sm font-bold text-white uppercase leading-tight">${item.title}</h3>
+                                </div>
+                            </div>
+                        </div>`;
+                });
+
+            } catch (e) {
+                loader.classList.add('hidden');
+                console.error(e);
+                grid.innerHTML = '<p class="col-span-full text-center text-red-500 text-xs mt-10">CONNECTION ERROR</p>';
+            }
+        }
+
+        // --- MUSIC ---
+        const audio = document.getElementById('bgAudio');
+        const mIcon = document.getElementById('musicIcon');
+        const mStatus = document.getElementById('musicStatus');
+
+        window.toggleMusic = function() {
+            if (audio.paused) { 
+                audio.play(); 
+                mIcon.className = 'fa-solid fa-pause text-[10px]'; 
+                mStatus.innerText = "Playing";
+                mStatus.classList.add('text-indigo-400');
+            } else { 
+                audio.pause(); 
+                mIcon.className = 'fa-solid fa-play text-[10px]'; 
+                mStatus.innerText = "Paused";
+                mStatus.classList.remove('text-indigo-400');
+            }
+        };
+
+        // --- ADMIN ---
+        window.adminLogin = function() {
+            if(prompt("Access Key:") === "twoce0102desain") {
+                isAdmin = true;
+                document.getElementById('btn-tambah').classList.remove('hidden');
+                alert("Master Access Granted");
+                // Refresh jika sedang di galeri
+                const title = document.getElementById('gallery-title').innerText.split(' ')[0].toLowerCase();
+                if(title && title !== 'category') loadData(title);
+            }
+        };
+
+        // --- MODAL & SELECT LOGIC ---
+        window.openModal = () => document.getElementById('modal-upload').classList.remove('hidden');
+        window.closeModal = () => document.getElementById('modal-upload').classList.add('hidden');
+
+        // Logic Tombol Kategori di Modal
+        window.selectCat = function(cat) {
+            document.getElementById('in-cat').value = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-500');
+                b.classList.add('border-white/10');
+            });
+            const btn = document.getElementById('btn-cat-' + cat);
+            btn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-500');
+            btn.classList.remove('border-white/10');
+        };
+
+        window.saveData = async function() {
+            const t = document.getElementById('in-title').value;
+            const u = document.getElementById('in-url').value;
+            const c = document.getElementById('in-cat').value;
+            
+            if(!t || !u || !c) return alert("Mohon lengkapi semua data!");
+            
+            const btn = document.getElementById('btn-save');
+            btn.innerText = "Uploading...";
+            btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, "produk"), { title: t, url: u, category: c, time: Date.now() });
+                alert("Sukses!");
+                closeModal();
+                loadData(c);
+                // Reset Form
+                document.getElementById('in-title').value = '';
+                document.getElementById('in-url').value = '';
+            } catch (e) { alert("Gagal Upload."); }
+            
+            btn.innerText = "Publish Now";
+            btn.disabled = false;
+        };
+
+        window.deleteData = async (id, cat) => {
+            if(confirm("Hapus permanen?")) { await deleteDoc(doc(db, "produk", id)); loadData(cat); }
+        };
+    </script>
+</body>
+</html>
+
+
